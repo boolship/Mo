@@ -33,10 +33,10 @@ namespace mo
     public class Mode
     {
         /// <summary>
-        /// Console program main method
+        /// Mo program main method
         /// </summary>
         /// <param name="args">
-        /// The program arguments enter by user.
+        /// The program arguments entered by user.
         /// </param>
         public static void Main(string[] args)
         {
@@ -45,7 +45,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Console run() method
+        /// Mo run() method
         /// </summary>
         /// <param name="args">
         /// The program arguments.
@@ -84,7 +84,7 @@ namespace mo
         /// The program arguments.
         /// </param>
         /// <returns>
-        /// True if successful, false if error in program arguments.
+        /// Success returns true, false if error in program arguments.
         /// </returns>
         public bool ParseCommands(ICollection<string> args)
         {
@@ -116,7 +116,7 @@ namespace mo
                 // command option, cliArg not Int32 (see continue)
                 bool currentArgCommand = false;
                 
-                // commands like W=, B=, WC=, BC=, WL=, BL=
+                // commands like W=, B=, WC=, BC=, WL=, BL=, QE=, IN=
                 List<string> commands = console.Commands;
                 foreach (var command in commands)
                 {

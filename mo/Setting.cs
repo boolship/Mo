@@ -51,12 +51,12 @@ namespace mo
                 + "\n\tQuickEdit Mode: {4,3}, Insert Mode: {5,3}";
 
         /// <summary>
-        /// Available program commands with int values.
+        /// Available program commands with int and true|false values.
         /// </summary>
         private readonly List<string> availableCommands = new List<string> { "W=", "B=", "WC=", "BC=", "WL=", "BL=", "QE=", "IN=" };
 
         /// <summary>
-        /// To disable QuickEdit mode, use ENABLE_EXTENDED_FLAGS without other flags.
+        /// To disable QuickEdit or Insert mode, use ENABLE_EXTENDED_FLAGS without other flag.
         /// </summary>
         private const int EnableExtendedFlags = 0x0080;
 
@@ -66,7 +66,7 @@ namespace mo
         private const int EnableQuickEditMode = 0x0040;
 
         /// <summary>
-        /// To enable QuickEdit mode, use ENABLE_INSERT_MODE | ENABLE_EXTENDED_FLAGS. 
+        /// To enable Insert mode, use ENABLE_INSERT_MODE | ENABLE_EXTENDED_FLAGS. 
         /// </summary>
         private const int EnableInsertMode = 0x0020;
 
@@ -105,7 +105,7 @@ namespace mo
         #region :: Setting class properties
 
         /// <summary>
-        /// Gets Commands.
+        /// Gets Commands list.
         /// </summary>
         public List<string> Commands
         {
@@ -113,7 +113,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets or sets WindowColumns.
+        /// Gets or sets WindowColumns with presets 0|1|2|3.
         /// </summary>
         internal int WindowColumns
         {
@@ -134,7 +134,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets or sets WindowLines.
+        /// Gets or sets WindowLines with presets 0|1|2|3.
         /// </summary>
         internal int WindowLines
         {
@@ -155,7 +155,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets or sets BufferColumns.
+        /// Gets or sets BufferColumns with presets 0|1|2|3.
         /// </summary>
         internal int BufferColumns
         {
@@ -176,7 +176,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets or sets BufferLines.
+        /// Gets or sets BufferLines with presets 0|1|2|3.
         /// </summary>
         internal int BufferLines
         {
@@ -197,7 +197,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets or sets InsertMode.
+        /// Gets or sets InsertMode with presets 0|1|2|3 true.
         /// True = 1, False = Int16.MaxVal
         /// </summary>
         internal int InsertMode
@@ -207,7 +207,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets or sets QuickEdit.
+        /// Gets or sets QuickEdit with presets 0|1|2|3 true.
         /// True = 1, False = Int16.MaxVal
         /// </summary>
         internal int QuickEdit
@@ -217,7 +217,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets default when unit test Console.WindowHeight throws IOException.
+        /// Gets unit test workaround when Console.WindowHeight throws IOException.
         /// </summary>
         private static int ConsoleWindowHeight
         {
@@ -238,7 +238,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets default when unit test Console.WindowWidth throws IOException.
+        /// Gets unit test workaround when Console.WindowWidth throws IOException.
         /// </summary>
         private static int ConsoleWindowWidth
         {
@@ -259,7 +259,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets default when unit test Console.BufferHeight throws IOException.
+        /// Gets unit test workaround when Console.BufferHeight throws IOException.
         /// </summary>
         private static int ConsoleBufferHeight
         {
@@ -280,7 +280,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets default when unit test Console.BufferWidth throws IOException.
+        /// Gets unit test workaround when Console.BufferWidth throws IOException.
         /// </summary>
         private static int ConsoleBufferWidth
         {
@@ -301,7 +301,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets a value indicating whether ConsoleQuickEdit.
+        /// Gets a value indicating whether ConsoleQuickEdit set.
         /// </summary>
         private bool ConsoleQuickEdit
         {
@@ -312,7 +312,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets a value indicating whether ConsoleInsertMode.
+        /// Gets a value indicating whether ConsoleInsertMode set.
         /// </summary>
         private bool ConsoleInsertMode
         {
@@ -325,27 +325,29 @@ namespace mo
         #endregion
 
         /// <summary>
-        /// Parse true, false to int.
+        /// Parse true and false to int.
         /// </summary>
         /// <param name="s">
-        /// Parse the string "true" or "false", case insensitive.
+        /// Parse the string "true" or "t" or "false" or "f", case insensitive.
         /// </param>
         /// <param name="result">
-        /// Set integer of 1=="true" and Int16.MaxValue otherwise.
+        /// Set result equal to 1 if true, or result equal to Int16.MaxValue otherwise.
         /// </param>
         /// <returns>
-        /// Parsing "true" or "false" returns true, otherwise false.
+        /// Parsing "true" or "t" or "false" or "f" returns true, otherwise false.
         /// </returns>
         public static bool TrueParse(string s, out int result)
         {
-            if (s.Equals("true", StringComparison.OrdinalIgnoreCase))
+            if (s.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                s.Equals("t", StringComparison.OrdinalIgnoreCase))
             {
                 result = 1;
                 return true;
             }
 
             result = Int16.MaxValue;
-            if (s.Equals("false", StringComparison.OrdinalIgnoreCase))
+            if (s.Equals("false", StringComparison.OrdinalIgnoreCase) ||
+                s.Equals("f", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -354,7 +356,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Current mode flag is set.
+        /// Check if flag set in Current Mode.
         /// </summary>
         /// <param name="flag">
         /// The console flag, e.g. ENABLE_QUICK_EDIT_MODE, ENABLE_INSERT_MODE.
@@ -413,7 +415,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Apply console settings.
+        /// Apply console settings in specific order.
         /// </summary>
         /// <returns>
         /// Success returns true, otherwise false
@@ -625,7 +627,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Set Command options for window, buffer, and other defaults.
+        /// Set Console command preset option or specified values.
         /// </summary>
         /// <param name="command">
         /// The command.
@@ -677,7 +679,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Set Preset options for window, buffer and other defaults.
+        /// Set Preset option for window, buffer and other values.
         /// </summary>
         /// <param name="option">
         /// preset option 0|1|2|3

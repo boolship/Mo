@@ -1,4 +1,5 @@
 The Mo project was built with Visual Studio 2010.
+Successfully tested with .Net 4 on XP through Windows 8.
 
 You only need one file: mo.exe
 It is located at: mo\bin\Release

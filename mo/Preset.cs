@@ -66,7 +66,7 @@ namespace mo
             + "\nPreset sizes are based on screen resolution."
             + "\n"
             + "\nSimple and quick usage examples include: \"mo\", \"mo 1\", \"mo 3 b=2\","
-            + "\n\"mo 2 qe=false in=false\"";
+            + "\n\"mo 2 qe=false in=false\", \"mo wc=160 bc=160\"";
 
         /// <summary>
         /// command line name
@@ -111,27 +111,27 @@ namespace mo
         #region :: Preset class properties
 
         /// <summary>
-        /// Gets or sets BufLin0.
+        /// Gets or sets static BufLin0.
         /// </summary>
         public static int BufLin0 { get; set; }
 
         /// <summary>
-        /// Gets or sets BufLin1.
+        /// Gets or sets static BufLin1.
         /// </summary>
         public static int BufLin1 { get; set; }
 
         /// <summary>
-        /// Gets or sets BufLin2.
+        /// Gets or sets static BufLin2.
         /// </summary>
         public static int BufLin2 { get; set; }
 
         /// <summary>
-        /// Gets or sets BufLin3.
+        /// Gets or sets static BufLin3.
         /// </summary>
         public static int BufLin3 { get; set; }
 
         /// <summary>
-        /// Gets or sets BufCol0.
+        /// Gets or sets static BufCol0.
         /// </summary>
         public static int BufCol0 { get; set; }
 
@@ -141,62 +141,62 @@ namespace mo
         public static int BufCol1 { get; set; }
 
         /// <summary>
-        /// Gets or sets BufCol2.
+        /// Gets or sets static BufCol2.
         /// </summary>
         public static int BufCol2 { get; set; }
 
         /// <summary>
-        /// Gets or sets BufCol3.
+        /// Gets or sets static BufCol3.
         /// </summary>
         public static int BufCol3 { get; set; }
 
         /// <summary>
-        /// Gets or sets WinLin0.
+        /// Gets or sets static WinLin0.
         /// </summary>
         public static int WinLin0 { get; set; }
 
         /// <summary>
-        /// Gets or sets WinLin1.
+        /// Gets or sets static WinLin1.
         /// </summary>
         public static int WinLin1 { get; set; }
 
         /// <summary>
-        /// Gets or sets WinLin3.
+        /// Gets or sets static WinLin2.
         /// </summary>
         public static int WinLin2 { get; set; }
 
         /// <summary>
-        /// Gets or sets WinLin3.
+        /// Gets or sets static WinLin3.
         /// </summary>
         public static int WinLin3 { get; set; }
 
         /// <summary>
-        /// Gets or sets WinCol0.
+        /// Gets or sets static WinCol0.
         /// </summary>
         public static int WinCol0 { get; set; }
 
         /// <summary>
-        /// Gets or sets WinCol1.
+        /// Gets or sets static WinCol1.
         /// </summary>
         public static int WinCol1 { get; set; }
 
         /// <summary>
-        /// Gets or sets WinCol2.
+        /// Gets or sets static WinCol2.
         /// </summary>
         public static int WinCol2 { get; set; }
 
         /// <summary>
-        /// Gets or sets WinCol3.
+        /// Gets or sets static WinCol3.
         /// </summary>
         public static int WinCol3 { get; set; }
 
         /// <summary>
-        /// Gets or sets Off.
+        /// Gets or sets value error code.
         /// </summary>
         internal static int SettingError { get; set; }
 
         /// <summary>
-        /// Gets unit test workaround where Console.LargestWindowHeight == 0.
+        /// Gets unit test workaround when Console.LargestWindowHeight == 0.
         /// </summary>
         internal static int ConsoleLargestWindowHeight
         {
@@ -217,7 +217,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Gets unit test workaround where Console.LargestWindowWidth == 0.
+        /// Gets unit test workaround when Console.LargestWindowWidth == 0.
         /// </summary>
         internal static int ConsoleLargestWindowWidth
         {
@@ -240,7 +240,7 @@ namespace mo
         #endregion
 
         /// <summary>
-        /// Show current settings.
+        /// Show program usage/help based on screen resolution.
         /// </summary>
         public static void ShowUsage()
         {
