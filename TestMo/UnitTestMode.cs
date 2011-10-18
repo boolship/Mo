@@ -383,8 +383,8 @@ namespace TestMo
                         new[] { "QE=true", "IN=true" },
                         new[] { "QE=FALSE", "IN=FALSE" },
                         new[] { "QE=TRUE", "IN=TRUE" },
-                        new[] { "QE=fAlSe", "IN=fAlSe" },
-                        new[] { "QE=TrUe", "IN=TrUe" }
+                        new[] { "QE=f", "IN=f" },
+                        new[] { "QE=t", "IN=t" }
                     };
             List<object[]> presets =
                 new List<object[]>
