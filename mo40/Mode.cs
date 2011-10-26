@@ -45,7 +45,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Mo run() method
+        /// Program run() method
         /// </summary>
         /// <param name="args">
         /// The program arguments.
@@ -102,7 +102,7 @@ namespace mo
                 if (isInt)
                 {
                     // preset values or error
-                    if (console.SettingPreset(arg))
+                    if (console.SettingPresetGroup(arg))
                     {
                         includePreset = true;
 

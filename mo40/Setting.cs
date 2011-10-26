@@ -3,7 +3,7 @@
 //   Copyright © boolship@gmail.com 2011
 // </copyright>
 // <summary>
-//   Console setting commands. 
+//   Console setting command options. 
 //
 //   Copyright @2011 by boolship@gmail.com
 //
@@ -31,7 +31,7 @@ namespace mo
     using System.Runtime.InteropServices;
 
     /// <summary>
-    /// Console Setting options.
+    /// Console Setting command options.
     /// </summary>
     public class Setting
     {
@@ -53,7 +53,7 @@ namespace mo
         /// <summary>
         /// Available program commands with int and true|false values.
         /// </summary>
-        private readonly List<string> availableCommands = new List<string> { "W=", "B=", "WC=", "BC=", "WL=", "BL=", "QE=", "IN=" };
+        private readonly List<string> availableCommands = new List<string> { "W=", "B=", "C=", "WC=", "BC=", "WL=", "BL=", "QE=", "IN=" };
 
         /// <summary>
         /// To disable QuickEdit or Insert mode, use ENABLE_EXTENDED_FLAGS without other flag.
@@ -303,35 +303,39 @@ namespace mo
         /// <summary>
         /// Gets a value indicating whether ConsoleQuickEdit set.
         /// </summary>
-        private bool ConsoleQuickEdit
+        private string ConsoleQuickEdit
         {
             get
             {
-                return IsSet(EnableQuickEditMode) ? true : false;
+                // unknown state in Bash shell
+                int rtn = IsSet(EnableQuickEditMode);
+                return rtn > 0 ? "True" : rtn == 0 ? "False" : "Unknown";
             }
         }
 
         /// <summary>
         /// Gets a value indicating whether ConsoleInsertMode set.
         /// </summary>
-        private bool ConsoleInsertMode
+        private string ConsoleInsertMode
         {
             get
             {
-                return IsSet(EnableInsertMode) ? true : false;
+                // unknown state in Bash shell
+                int rtn = IsSet(EnableInsertMode);
+                return rtn > 0 ? "True" : rtn == 0 ? "False" : "Unknown";
             }
         }
 
         #endregion
 
         /// <summary>
-        /// Parse true and false to int.
+        /// Parse true and false to int result.
         /// </summary>
         /// <param name="s">
-        /// Parse the string "true" or "t" or "false" or "f", case insensitive.
+        /// Parse the strings "true" or "t" and "false" or "f", case insensitive.
         /// </param>
         /// <param name="result">
-        /// Set result equal to 1 if true, or result equal to Int16.MaxValue otherwise.
+        /// Set result out equal to 1 if true, or equal to Int16.MaxValue if false.
         /// </param>
         /// <returns>
         /// Parsing "true" or "t" or "false" or "f" returns true, otherwise false.
@@ -363,22 +367,36 @@ namespace mo
         /// See http://msdn.microsoft.com/en-us/library/ms686033%28VS.85%29.aspx
         /// </param>
         /// <returns>
-        /// True if flag is set, else false.
+        /// Return 1 if flag is set, 0 if flag not set, -1 if unknown.
         /// </returns>
-        public bool IsSet(int flag)
+        public int IsSet(int flag)
         {
-            const int StdInputHandle = -10;
-            var handleConsole = GetStdHandle(StdInputHandle);
-
-            // #TODO# handleConsole not working in unit test, returns false
-            if (String.Equals(handleConsole.ToString(), "0"))
+            int result = 0;
+            try
             {
+                const int StdInputHandle = -10;
+                var handleConsole = GetStdHandle(StdInputHandle);
+                if (String.Equals(handleConsole.ToString(), "0"))
+                {
+                    // handleConsole not working in unit test
+                    const string Msg = "warning: GetStdHandle undefined ({0})";
+                    throw new Win32Exception(String.Format(Msg, handleConsole));
+                }
+
+                int currentMode;
+                GetConsoleMode(handleConsole, out currentMode);
+
+                // Bash shell current mode Unknown
+                result = (currentMode < 0x0020) ? -1 : (currentMode | flag) == currentMode ? 1 : 0;
+            }
+            catch (Win32Exception w)
+            {
+                // more info using: w.StackTrace, Exception e = w.GetBaseException();
+                TextWriter ew = Console.Error;
+                ew.WriteLine("win32 " + w.Message);
             }
 
-            int currentMode;
-            GetConsoleMode(handleConsole, out currentMode);
-
-            return (currentMode | flag) == currentMode;
+            return result;
         }
 
         /// <summary>
@@ -422,6 +440,7 @@ namespace mo
         /// </returns>
         public bool SetConsole()
         {
+            bool deferBufferColumns = false;
             if (BufferLines > 0)
             {
                 int bl = (WindowLines > 0 && BufferLines < WindowLines) ? WindowLines : BufferLines;
@@ -457,16 +476,26 @@ namespace mo
 
             if (BufferColumns > 0)
             {
+                // BufferColumns increases to WindowsColumns if setting both
                 int bc = (WindowColumns > 0 && BufferColumns < WindowColumns) ? WindowColumns : BufferColumns;
                 string msg = "buf col set " + bc;
                 try
                 {
-                    if (bc < Preset.BufCol0 | bc > Preset.BufCol3)
+                    if (bc < Preset.WinCol0 | bc > Preset.BufCol3)
                     {
                         throw new ArgumentOutOfRangeException();
                     }
 
-                    Console.BufferWidth = bc;
+                    if (bc < ConsoleWindowWidth && BufferColumns >= WindowColumns && WindowColumns > 0)
+                    {
+                        // valid setting deferred if setting both
+                        deferBufferColumns = true;
+                    }
+                    else
+                    {
+                        // bc < ConsoleWindowWidth throws ArugmentOutOfRangeException (WindowsColumns == 0)
+                        Console.BufferWidth = bc;
+                    }
                 }
                 catch (IOException)
                 {
@@ -474,13 +503,17 @@ namespace mo
                 }
                 catch (ArgumentOutOfRangeException)
                 {
-                    if (bc < Preset.BufCol0)
+                    if (bc < Preset.WinCol0)
                     {
-                        msg = String.Format("err: minimum buf col {0}", Preset.BufCol0);
+                        msg = String.Format("err: minimum buf col {0}", Preset.WinCol0);
                     }
                     else if (bc > Preset.BufCol3)
                     {
                         msg = String.Format("err: maximum buf col {0}", Preset.BufCol3);
+                    }
+                    else if (bc < ConsoleWindowWidth)
+                    {
+                        msg = String.Format("err: minimum buf col equal to win col {0}", ConsoleWindowWidth);
                     }
                 }
 
@@ -507,7 +540,7 @@ namespace mo
                 {
                     if (WindowLines < Preset.WinLin0)
                     {
-                        msg = String.Format("err: minimum win lin {0}", Preset.WinLin0);                        
+                        msg = String.Format("err: minimum win lin {0}", Preset.WinLin0);
                     }
                     else if (WindowLines > Preset.WinLin3)
                     {
@@ -538,7 +571,7 @@ namespace mo
                 {
                     if (WindowColumns < Preset.WinCol0)
                     {
-                        msg = String.Format("err: minimum win col {0}", Preset.WinCol0);                                            
+                        msg = String.Format("err: minimum win col {0}", Preset.WinCol0);
                     }
                     else if (WindowColumns > Preset.WinCol3)
                     {
@@ -549,16 +582,37 @@ namespace mo
                 Console.WriteLine(msg);
             }
 
+            if (deferBufferColumns)
+            {
+                int bc = (WindowColumns > 0 && BufferColumns < WindowColumns) ? WindowColumns : BufferColumns;
+                try
+                {
+                    // bc < ConsoleWindowWidth throws ArugmentOutOfRangeException 
+                    Console.BufferWidth = bc;                
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine(String.Format("err: setting deferred buf col {0}", bc));
+                }
+            }
+
             if (QuickEdit > 0)
             {
                 try
                 {
                     const int StdInputHandle = -10;
                     var handleConsole = GetStdHandle(StdInputHandle);
+                    if (String.Equals(handleConsole.ToString(), "0"))
+                    {
+                        // handleConsole not working in unit test
+                        const string Msg = "warning: GetStdHandle undefined ({0})";
+                        throw new Win32Exception(String.Format(Msg, handleConsole));
+                    }
+
                     int currentMode;
                     GetConsoleMode(handleConsole, out currentMode);
 
-                    if (QuickEdit == 1 && !IsSet(EnableQuickEditMode))
+                    if (QuickEdit == 1 && IsSet(EnableQuickEditMode) < 1)
                     {
                         int result = SetConsoleMode(handleConsole, currentMode | EnableQuickEditMode | EnableExtendedFlags);
                         if (result == 0)
@@ -566,7 +620,7 @@ namespace mo
                             throw new Win32Exception(Marshal.GetLastWin32Error());
                         }                        
                     }
-                    else if (QuickEdit == Int16.MaxValue && IsSet(EnableQuickEditMode))
+                    else if (QuickEdit == Int16.MaxValue && IsSet(EnableQuickEditMode) == 1)
                     {
                         int currentModeOff = currentMode - EnableQuickEditMode;
                         int result = SetConsoleMode(handleConsole, currentModeOff | EnableExtendedFlags);
@@ -580,7 +634,7 @@ namespace mo
                 {
                     // more info using: w.StackTrace, Exception e = w.GetBaseException();
                     TextWriter ew = Console.Error;
-                    ew.WriteLine("win32 err: " + w.ErrorCode + ": " + w.Message);
+                    ew.WriteLine("win32 " + w.Message);
                 }
 
                 Console.WriteLine("quick edit set " + (QuickEdit == 1 ? true : false));
@@ -592,10 +646,17 @@ namespace mo
                 {
                     const int StdInputHandle = -10;
                     var handleConsole = GetStdHandle(StdInputHandle);
+                    if (String.Equals(handleConsole.ToString(), "0"))
+                    {
+                        // handleConsole not working in unit test
+                        const string Msg = "warning: GetStdHandle undefined ({0})";
+                        throw new Win32Exception(String.Format(Msg, handleConsole));
+                    }
+
                     int currentMode;
                     GetConsoleMode(handleConsole, out currentMode);
 
-                    if (InsertMode == 1 && !IsSet(EnableInsertMode))
+                    if (InsertMode == 1 && IsSet(EnableInsertMode) < 1)
                     {
                         int result = SetConsoleMode(handleConsole, currentMode | EnableInsertMode | EnableExtendedFlags);
                         if (result == 0)
@@ -603,7 +664,7 @@ namespace mo
                             throw new Win32Exception(Marshal.GetLastWin32Error());
                         }
                     }
-                    else if (InsertMode == Int16.MaxValue && IsSet(EnableInsertMode))
+                    else if (InsertMode == Int16.MaxValue && IsSet(EnableInsertMode) == 1)
                     {
                         int currentModeOff = currentMode - EnableInsertMode;
                         int result = SetConsoleMode(handleConsole, currentModeOff | EnableExtendedFlags);
@@ -617,7 +678,7 @@ namespace mo
                 {
                     // more info using: w.StackTrace, Exception e = w.GetBaseException();
                     TextWriter ew = Console.Error;
-                    ew.WriteLine("win32 err: " + w.ErrorCode + ": " + w.Message);
+                    ew.WriteLine("win32 " + w.Message);
                 }
 
                 Console.WriteLine("insert set " + (InsertMode == 1 ? true : false));
@@ -627,7 +688,7 @@ namespace mo
         }
 
         /// <summary>
-        /// Set Console command preset option or specified values.
+        /// Setting Command preset or specified values.
         /// </summary>
         /// <param name="command">
         /// The command.
@@ -640,46 +701,45 @@ namespace mo
         /// </returns>
         public bool SettingCommand(string command, int option)
         {
-            if (String.Compare(command, "W=", StringComparison.OrdinalIgnoreCase) == 0)
+            switch (command.ToLower())
             {
-                WindowColumns = option;
-                WindowLines = option;
-            }
-            else if (String.Compare(command, "B=", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                BufferColumns = option;
-                BufferLines = option;
-            }
-            else if (String.Compare(command, "WC=", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                WindowColumns = option;
-            }
-            else if (String.Compare(command, "BC=", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                BufferColumns = option;
-            }
-            else if (String.Compare(command, "WL=", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                WindowLines = option;
-            }
-            else if (String.Compare(command, "BL=", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                BufferLines = option;
-            }
-            else if (String.Compare(command, "QE=", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                QuickEdit = option;
-            }
-            else if (String.Compare(command, "IN=", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                InsertMode = option;
+                case "w=":
+                    WindowColumns = option;
+                    WindowLines = option;
+                    break;
+                case "b=":
+                    BufferColumns = option;
+                    BufferLines = option;
+                    break;
+                case "c=":
+                    BufferColumns = option;
+                    WindowColumns = option;
+                    break;
+                case "wc=":
+                    WindowColumns = option;
+                    break;
+                case "bc=":
+                    BufferColumns = option;
+                    break;
+                case "wl=":
+                    WindowLines = option;
+                    break;
+                case "bl=":
+                    BufferLines = option;
+                    break;
+                case "qe=":
+                    QuickEdit = option;
+                    break;
+                case "in=":
+                    InsertMode = option;
+                    break;
             }
 
             return ErrorFreeSetting();
         }
 
         /// <summary>
-        /// Set Preset option for window, buffer and other values.
+        /// Setting Preset Group options for window, buffer and other values.
         /// </summary>
         /// <param name="option">
         /// preset option 0|1|2|3
@@ -687,7 +747,7 @@ namespace mo
         /// <returns>
         /// Success returns true, otherwise false.
         /// </returns>
-        public bool SettingPreset(int option)
+        public bool SettingPresetGroup(int option)
         {
             WindowColumns = option;
             WindowLines = option;

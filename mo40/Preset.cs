@@ -34,12 +34,12 @@ namespace mo
         #region :: Preset class fields
 
         /// <summary>
-        /// Console help message with format arguments 0-18
+        /// Program help message with format arguments 0-18
         /// </summary>
         public const string Usage =
             "Set Console Window & Buffer sizes, QuickEdit, other options from command line."
             + "\n"
-            + "\n{0} [0|1|2|3] [[W|B]=n] [[WC|BC]=n] [[WL|BL]=n] [QE=[true|false]] \n\t[IN=[true|false]]"
+            + "\n{0} [0|1|2|3] [[W|B|C]=n] [[WC|BC]=n] [[WL|BL]=n] [QE=[true|false]] \n\t[IN=[true|false]]"
             + "\n"
             + "\n              No arguement will display Console status."
             + "\n  0           Small  window ~1/3 screen. W: {1,3}/{5,-3} B: {9,3}/{13,-3} col/lin"
@@ -50,6 +50,7 @@ namespace mo
             + "\n"
             + "\n  W=n         Window=n, where n=specify|0|1|2|3 (Small, Medium, Large, Max)"
             + "\n  B=n         Buffer=n, where n=specify|0|1|2|3 (Small, Medium, Large, Max)"
+            + "\n  C=n         Column=n, where n=specify|0|1|2|3 (Small, Medium, Large, Max)"
             + "\n  WC=n        Window Columns=n, where n=specify|0|1|2|3"
             + "\n  BC=n        Buffer Columns=n, where n=specify|0|1|2|3"
             + "\n  WL=n        Window Lines=n, where n=specify|0|1|2|3"
@@ -66,7 +67,7 @@ namespace mo
             + "\nPreset sizes are based on screen resolution."
             + "\n"
             + "\nSimple and quick usage examples include: \"mo\", \"mo 1\", \"mo 3 b=2\","
-            + "\n\"mo 2 qe=false in=false\", \"mo wc=160 bc=160\"";
+            + "\n\"mo 2 qe=f in=f\", \"mo 1 c=100\"";
 
         /// <summary>
         /// command line name

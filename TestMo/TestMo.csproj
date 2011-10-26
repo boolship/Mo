@@ -49,9 +49,9 @@
     <Compile Include="UnitTestMode.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\mo\mo.csproj">
-      <Project>{0CA21E65-E01F-4587-84E3-D8E3E2A53D2F}</Project>
-      <Name>mo</Name>
+    <ProjectReference Include="..\mo40\mo40.csproj">
+      <Project>{EABC838B-B74C-41D2-996B-08F54753CDB6}</Project>
+      <Name>mo40</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

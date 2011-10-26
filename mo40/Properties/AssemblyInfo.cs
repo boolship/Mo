@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("mo")]
+[assembly: AssemblyTitle("mo40")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("boolship")]
-[assembly: AssemblyProduct("mo")]
-[assembly: AssemblyCopyright("Copyright © boolship@gmail.com 2011")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("mo40")]
+[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5986a598-e8dc-4169-83c5-ac59faa0a6f4")]
+[assembly: Guid("d738a9c9-bc4a-4f9d-a09c-c72f29680b20")]
 
 // Version information for an assembly consists of the following four values:
 //

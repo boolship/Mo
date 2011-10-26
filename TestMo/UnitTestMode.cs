@@ -431,6 +431,7 @@ namespace TestMo
                     {
                         new[] { "W=2.5" },
                         new[] { "B=.10" },
+                        new[] { "C=1.0" },
                         new[] { "WC=1E10" },
                         new[] { "BC=0xffffff" },
                         new[] { "WL=" },
@@ -509,7 +510,7 @@ namespace TestMo
                 new List<object[]>
                     {
                         new[] { Preset.WinLin0.ToString(), Preset.WinCol0.ToString() },
-                        new[] { Preset.BufLin0.ToString(), Preset.BufCol0.ToString() },
+                        new[] { Preset.BufLin0.ToString(), Preset.WinCol0.ToString() },
                         new[] { Preset.WinCol3.ToString() },
                         new[] { Preset.BufCol3.ToString() },
                         new[] { Preset.WinLin3.ToString() },

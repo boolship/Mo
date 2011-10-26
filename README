@@ -1,10 +1,42 @@
-The Mo project was built with Visual Studio 2010.
-Successfully tested with .Net 4 on XP through Windows 8.
+Set Console Window & Buffer sizes, QuickEdit, other options 
+from command line.
 
-You only need one file: mo.exe
-It is located at: mo\bin\Release
+The "mo" program runs under any .Net versions or WinOS.
+Successfully tested on installed frameworks .Net 2.0-4.5 
+and on WinOS XP thru Windows 8. Runs in Console with DOS 
+or Bash shells.
 
-The rest of the stuff is for Visual Studio.
+You only need four files: mo, mo.cmd, mo20.exe, mo40.exe
+They are located in same directory as this README file.
+The rest of the stuff is for Visual Studio. 
+
+Runtime and Visual Studio notes:
+
+(0) Copy the four files into your WinOS path, run "mo" in 
+DOS console or Bash shell on windows, e.g. Git Bash. For
+help run "mo x".
+
+(1) The main project "mo40" source files are linked into
+the "mo20" project. The "mo20" project is a target 
+framework executable, without source. The test project 
+"TestMo" references the main project "mo40".
+
+(2) Each project post build event copies target 
+framework 2.0 and 4.0 executables into this directory.
+
+(3) This solution was built with Visual Studio 2010.
+Since Visual Studion 2010 does not target frameworks 
+v1.0 and v1.1 these are not supported.
+
+(4) The batch file mo.cmd runs a .Net program with the 
+same name and version suffix. Convention requires a 
+set of target executables. It works under .Net 2.0-4.5 
+versions and on WinOS XP through Windows 8. 
+
+(5) The script mo runs (in Bash shell) a .Net program 
+with the same name and version suffix. Convention
+requires a set of target executables. It works under 
+.Net 2.0-4.5 versions and on WinOS XP through Windows 8.
 
 Good luck.
 
